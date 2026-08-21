@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy Foods - Wallet Recharge Payment Tester</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #BD3839;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-wallet {
+            background-color: #BD3839;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        textarea:focus {
+            border-color: #BD3839;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #BD3839;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #a02f30;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .order-details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #BD3839;
+        }
+
+        .order-details h3 {
+            margin-top: 0;
+            color: #BD3839;
+        }
+
+        .detail-item {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .wallet-card {
+            background: linear-gradient(135deg, #BD3839 0%, #e85d5e 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .wallet-card h4 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+        }
+
+        .wallet-card .amount {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .wallet-card .label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .user-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .user-info h4 {
+            margin-top: 0;
+            color: #084298;
+        }
+
+        .user-info .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .razorpay-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffecb5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .razorpay-info h4 {
+            margin-top: 0;
+            color: #664d03;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .log-container {
+            margin-top: 20px;
+        }
+
+        .log-output {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .complete-payload {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .complete-payload h4 {
+            margin-top: 0;
+            color: #0f5132;
+        }
+
+        .complete-payload pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            background-color: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #138496;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .instructions {
+            background-color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h4 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+
+        .instructions ol {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .instructions code {
+            background-color: #cbd5e0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Joy Foods - Wallet Recharge Tester <span class="badge badge-wallet">RECHARGE</span></h1>
+
+        <div class="instructions">
+            <h4>How to use:</h4>
+            <ol>
+                <li>Call <code>POST /api/v1/user/profile/recharge_initiate</code> with <code>amount</code> parameter</li>
+                <li>Paste the JSON response below</li>
+                <li>Click "Parse & Show Details" to view recharge info</li>
+                <li>Click "Pay Now" to open Razorpay checkout</li>
+                <li>After payment, copy the payload for <code>recharge_complete</code> API</li>
+            </ol>
+        </div>
+
+        <div class="form-group">
+            <label for="jsonInput">Paste recharge_initiate API response here:</label>
+            <textarea id="jsonInput" placeholder="Paste your JSON response from /api/v1/user/profile/recharge_initiate here..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="parseAndShowDetails()">Parse & Show Details</button>
+            <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <div id="rechargeDetails" class="order-details hidden">
+            <h3>Wallet Recharge Details</h3>
+            <div id="detailsContent"></div>
+
+            <div class="razorpay-info" id="razorpayInfo">
+                <h4>Razorpay Payment</h4>
+                <p>Click the button below to open Razorpay checkout and complete the recharge:</p>
+                <button class="btn-primary" onclick="processPayment()" style="margin-top: 10px;">
+                    Pay Now
+                </button>
+            </div>
+        </div>
+
+        <div id="paymentResponse" class="complete-payload hidden">
+            <h4>Payment Response - Use this for recharge_complete API</h4>
+            <pre id="completePayload"></pre>
+            <button class="copy-btn" onclick="copyPayload()">Copy Payload</button>
+        </div>
+
+        <div id="logContainer" class="log-container hidden">
+            <h3>Payment Log</h3>
+            <div id="logOutput" class="log-output"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = null;
+
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function parseAndShowDetails() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+
+            if (!jsonInput) {
+                showMessage('Please paste your JSON data first.');
+                return;
+            }
+
+            try {
+                const response = JSON.parse(jsonInput);
+
+                if (!response.success || !response.data) {
+                    showMessage('API response indicates failure: ' + (response.message || 'Unknown error'));
+                    return;
+                }
+
+                currentData = response.data;
+                displayRechargeDetails(currentData);
+                showMessage('JSON parsed successfully!', 'success');
+
+            } catch (error) {
+                showMessage(`Invalid JSON format: ${error.message}`);
+            }
+        }
+
+        function displayRechargeDetails(data) {
+            const detailsContent = document.getElementById('detailsContent');
+            const razorpayData = data.razorpay;
+
+            if (!razorpayData) {
+                showMessage('No Razorpay data found in response.');
+                return;
+            }
+
+            const html = `
+                <div class="wallet-card">
+                    <h4>Recharge Amount</h4>
+                    <div class="amount">${data.formatted_amount || '₹' + data.amount.toFixed(2)}</div>
+                    <div class="label">Will be added to your wallet</div>
+                </div>
+
+                <div class="user-info">
+                    <h4>User Information</h4>
+                    <div class="info-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">${razorpayData.prefill?.name || 'N/A'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">${razorpayData.prefill?.email || 'N/A'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="detail-label">Contact:</span>
+                        <span class="detail-value">${razorpayData.prefill?.contact || 'N/A'}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <div class="detail-item">
+                        <span class="detail-label">Order ID:</span>
+                        <span class="detail-value" style="font-family: monospace;">${razorpayData.order_id}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Amount (paise):</span>
+                        <span class="detail-value">${razorpayData.amount}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Currency:</span>
+                        <span class="detail-value">${razorpayData.currency}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Description:</span>
+                        <span class="detail-value">${razorpayData.description}</span>
+                    </div>
+                </div>
+            `;
+
+            detailsContent.innerHTML = html;
+            document.getElementById('rechargeDetails').classList.remove('hidden');
+        }
+
+        function processPayment() {
+            if (!currentData || !currentData.razorpay) {
+                showMessage('No Razorpay payment data available.');
+                return;
+            }
+
+            const razorpayData = currentData.razorpay;
+
+            const options = {
+                key: razorpayData.key,
+                amount: razorpayData.amount,
+                currency: razorpayData.currency || 'INR',
+                name: razorpayData.name,
+                description: razorpayData.description,
+                image: razorpayData.image,
+                order_id: razorpayData.order_id,
+                prefill: razorpayData.prefill,
+                theme: razorpayData.theme,
+                handler: function (response) {
+                    handlePaymentSuccess(response);
+                },
+                modal: {
+                    ondismiss: function() {
+                        logMessage('Payment cancelled by user', 'WARNING');
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+
+            rzp.on('payment.failed', function (response) {
+                handlePaymentFailure(response.error);
+            });
+
+            rzp.open();
+        }
+
+        function handlePaymentSuccess(response) {
+            const payload = {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+            };
+
+            showCompletePayload(payload);
+
+            logMessage(`
+=== PAYMENT SUCCESS ===
+Timestamp: ${new Date().toISOString()}
+Payment ID: ${response.razorpay_payment_id}
+Order ID: ${response.razorpay_order_id}
+Signature: ${response.razorpay_signature}
+
+Use the payload above to call recharge_complete API
+POST /api/v1/user/profile/recharge_complete
+===========================
+            `, 'SUCCESS');
+
+            showMessage('Payment successful! Copy the payload below for recharge_complete API.', 'success');
+        }
+
+        function handlePaymentFailure(error) {
+            logMessage(`
+=== PAYMENT FAILED ===
+Timestamp: ${new Date().toISOString()}
+Error Code: ${error.code}
+Description: ${error.description}
+Source: ${error.source}
+Step: ${error.step}
+Reason: ${error.reason}
+===========================
+            `, 'FAILED');
+
+            showMessage('Payment failed: ' + error.description);
+        }
+
+        function showCompletePayload(payload) {
+            document.getElementById('completePayload').textContent = JSON.stringify(payload, null, 2);
+            document.getElementById('paymentResponse').classList.remove('hidden');
+        }
+
+        function copyPayload() {
+            const payload = document.getElementById('completePayload').textContent;
+            navigator.clipboard.writeText(payload).then(() => {
+                showMessage('Payload copied to clipboard!', 'success');
+            }).catch(err => {
+                showMessage('Failed to copy: ' + err);
+            });
+        }
+
+        function logMessage(message, status = 'INFO') {
+            const logOutput = document.getElementById('logOutput');
+            const logContainer = document.getElementById('logContainer');
+
+            logOutput.textContent = message + '\n' + logOutput.textContent;
+            logContainer.classList.remove('hidden');
+            logContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearAll() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('messageContainer').innerHTML = '';
+            document.getElementById('rechargeDetails').classList.add('hidden');
+            document.getElementById('paymentResponse').classList.add('hidden');
+            document.getElementById('logContainer').classList.add('hidden');
+            document.getElementById('logOutput').textContent = '';
+            document.getElementById('completePayload').textContent = '';
+            currentData = null;
+        }
+
+        // Sample data for reference
+        window.onload = function() {
+            const sampleResponse = `{
+    "status": 200,
+    "success": true,
+    "message": "Payment initiated successfully",
+    "data": {
+        "amount": 100,
+        "formatted_amount": "₹100.00",
+        "razorpay": {
+            "key": "rzp_test_2otcZJlyPiUnbq",
+            "amount": 10000,
+            "currency": "INR",
+            "name": "Joy Foods",
+            "description": "Wallet Recharge",
+            "image": "http://localhost/joy_foods_backend/assets/images/logo.png",
+            "order_id": "order_S2rW6XZN9qLlx1",
+            "prefill": {
+                "name": "Ram Prabhu",
+                "email": "prabhu@gmail.com",
+                "contact": "9182853221"
+            },
+            "theme": {
+                "color": "#BD3839"
+            }
+        }
+    }
+}`;
+
+            document.getElementById('jsonInput').placeholder =
+                'Paste your recharge_initiate API response here...\n\n' +
+                'Sample Response:\n' + sampleResponse;
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "111094991955",
+    "project_id": "joi-foods-prod",
+    "storage_bucket": "joi-foods-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:111094991955:android:fbe286999eddf24affcaa6",
+        "android_client_info": {
+          "package_name": "com.cct.joifoods"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDONTgbJZCZqvQ9M_56VIhLMLDR8kCitLo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

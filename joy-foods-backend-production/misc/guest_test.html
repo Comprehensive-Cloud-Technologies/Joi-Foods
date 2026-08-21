@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy Foods - Guest QSR Order Tester</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #BD3839;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        h1 small {
+            display: block;
+            font-size: 14px;
+            color: #888;
+            font-weight: 400;
+            margin-top: 5px;
+        }
+
+        h3 { color: #BD3839; margin-top: 0; }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            border-color: #BD3839;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button:hover { transform: translateY(-1px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-primary { background-color: #BD3839; color: white; }
+        .btn-primary:hover { background-color: #a02e2f; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-info { background-color: #17a2b8; color: white; }
+        .btn-warning { background-color: #ffc107; color: #333; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-veg { background: #d4edda; color: #155724; border: 1px solid #28a745; }
+        .badge-nonveg { background: #f8d7da; color: #721c24; border: 1px solid #dc3545; }
+
+        .section {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #BD3839;
+        }
+
+        .section.success-section { border-left-color: #28a745; background: #f0fff4; }
+        .section.info-section { border-left-color: #17a2b8; background: #f0f9ff; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 13px;
+        }
+
+        th { font-weight: 600; color: #555; background: #f1f1f1; }
+
+        .cart-actions { display: flex; align-items: center; gap: 5px; }
+        .cart-actions button { padding: 4px 10px; font-size: 16px; }
+        .cart-qty { font-weight: 700; font-size: 16px; min-width: 30px; text-align: center; }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+        }
+        .summary-row.total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #BD3839;
+            border-top: 2px solid #BD3839;
+            padding-top: 10px;
+            margin-top: 5px;
+        }
+
+        .error { background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; margin-top: 10px; }
+        .success { background-color: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-top: 10px; }
+        .info { background-color: #d1ecf1; color: #0c5460; padding: 12px; border-radius: 6px; margin-top: 10px; }
+
+        .log-output {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+
+        .hidden { display: none; }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 25px;
+        }
+
+        .step {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e9ecef;
+            color: #666;
+        }
+        .step.active { background: #BD3839; color: white; }
+        .step.done { background: #28a745; color: white; }
+
+        .category-pills {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .category-pill {
+            padding: 6px 16px;
+            border-radius: 20px;
+            border: 2px solid #ddd;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .category-pill.active { border-color: #BD3839; background: #BD3839; color: white; }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .product-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+        .product-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #f0f0f0;
+        }
+        .product-card h4 { margin: 10px 0 5px; font-size: 14px; }
+        .product-card .price { color: #BD3839; font-weight: 700; font-size: 16px; }
+        .product-card .stock-out { color: #dc3545; font-size: 12px; font-weight: 600; }
+
+        .order-success {
+            text-align: center;
+            padding: 30px;
+        }
+        .order-success .check-icon {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: #28a745; color: white; font-size: 40px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .order-success .order-number { font-size: 24px; font-weight: 700; color: #333; }
+        .order-success .pickup-code {
+            font-size: 36px; font-weight: 700; color: #BD3839;
+            letter-spacing: 8px; margin: 15px 0;
+            padding: 15px; background: #fff5f5; border-radius: 8px;
+        }
+
+        .divider {
+            display: flex; align-items: center; gap: 10px;
+            margin: 20px 0; color: #999; font-size: 13px;
+        }
+        .divider::before, .divider::after {
+            content: ''; flex: 1; border-top: 1px solid #ddd;
+        }
+
+        .timeline {
+            display: flex; justify-content: space-between; margin: 15px 0;
+            position: relative; padding: 0 10px;
+        }
+        .timeline::before {
+            content: ''; position: absolute; top: 14px; left: 30px; right: 30px;
+            height: 3px; background: #e9ecef; z-index: 0;
+        }
+        .timeline-step {
+            text-align: center; position: relative; z-index: 1; flex: 1;
+        }
+        .timeline-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: #e9ecef; color: #999; font-size: 14px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 6px;
+        }
+        .timeline-dot.reached { background: #28a745; color: white; }
+        .timeline-dot.current { background: #BD3839; color: white; box-shadow: 0 0 0 4px rgba(189,56,57,0.2); }
+        .timeline-dot.failed { background: #dc3545; color: white; }
+        .timeline-label { font-size: 10px; color: #888; }
+        .timeline-label.active { color: #333; font-weight: 600; }
+        .timeline-time { font-size: 9px; color: #aaa; margin-top: 2px; }
+
+        .tracking-card {
+            border: 1px solid #eee; border-radius: 8px; padding: 20px;
+            background: white; margin-top: 15px;
+        }
+        .tracking-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 15px; border-bottom: 2px solid #f0f0f0; margin-bottom: 15px;
+        }
+        .tracking-status {
+            padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; color: white;
+        }
+        .tracking-items { margin: 15px 0; }
+        .tracking-item {
+            display: flex; justify-content: space-between; padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5; font-size: 13px;
+        }
+        .tracking-item:last-child { border-bottom: none; }
+
+        .copy-btn {
+            background: none; border: 1px solid #ddd; border-radius: 4px;
+            padding: 2px 8px; font-size: 11px; color: #666; cursor: pointer;
+            margin-left: 8px;
+        }
+        .copy-btn:hover { background: #f5f5f5; transform: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Joy Foods - Guest QSR Tester
+            <small>Complete guest ordering flow: Browse &rarr; Cart &rarr; Pay &rarr; Order</small>
+        </h1>
+
+        <div class="step-indicator">
+            <span class="step active" id="step1">1. Setup</span>
+            <span class="step" id="step2">2. Browse</span>
+            <span class="step" id="step3">3. Cart</span>
+            <span class="step" id="step4">4. Pay</span>
+            <span class="step" id="step5">5. Done</span>
+        </div>
+
+        <!-- STEP 1: Setup -->
+        <div id="setupSection">
+            <h3>Configuration</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Base URL</label>
+                    <input type="text" id="baseUrl" value="http://localhost/joy_foods_backend/" placeholder="http://localhost/joy_foods_backend/">
+                </div>
+                <div class="form-group">
+                    <label>API Key (Auth Header)</label>
+                    <input type="text" id="apiKey" placeholder="Enter API authorization key">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Store Code</label>
+                    <input type="text" id="storeCode" placeholder="e.g. STR001">
+                </div>
+                <div class="form-group">
+                    <label>Session ID (auto-generated on first cart add)</label>
+                    <input type="text" id="sessionId" placeholder="Will be auto-filled" readonly style="background:#f5f5f5;">
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="loadStoreInfo()">Connect to Store</button>
+                <button class="btn-secondary" onclick="clearAll()">Reset</button>
+            </div>
+            <div id="storeInfo" class="section hidden">
+                <h3>Store Connected</h3>
+                <div id="storeInfoContent"></div>
+            </div>
+
+            <div class="divider">OR TRACK AN EXISTING ORDER</div>
+            <div class="form-row">
+                <div class="form-group" style="flex:3;">
+                    <label>Order Token</label>
+                    <input type="text" id="orderToken" placeholder="Paste your order token here...">
+                </div>
+                <div class="form-group" style="flex:1; display:flex; align-items:flex-end;">
+                    <button class="btn-info" onclick="trackOrder()" style="width:100%;">Track Order</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracking View -->
+        <div id="trackingSection" class="hidden"></div>
+
+        <div id="messageContainer"></div>
+
+        <!-- STEP 2: Browse -->
+        <div id="browseSection" class="hidden">
+            <h3>Browse Products</h3>
+            <div class="form-row">
+                <div class="form-group" style="flex:3;">
+                    <label>Search Products</label>
+                    <input type="text" id="searchKeyword" placeholder="Type to search (min 2 chars)..." onkeyup="debounceSearch()">
+                </div>
+                <div class="form-group" style="flex:1; display:flex; align-items:flex-end;">
+                    <button class="btn-info" onclick="searchProducts()" style="width:100%;">Search</button>
+                </div>
+            </div>
+            <div id="categoriesContainer"></div>
+            <div id="productsContainer"></div>
+        </div>
+
+        <!-- STEP 3: Cart -->
+        <div id="cartSection" class="hidden">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>Your Cart</h3>
+                <button class="btn-secondary btn-sm" onclick="goToBrowse()">Continue Shopping</button>
+            </div>
+            <div id="cartContent"></div>
+        </div>
+
+        <!-- STEP 4: Payment -->
+        <div id="paymentSection" class="hidden">
+            <h3>Checkout</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Name *</label>
+                    <input type="text" id="guestName" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="text" id="guestPhone" placeholder="10-digit phone number" maxlength="10">
+                </div>
+            </div>
+            <div id="deliveryLocationRow" class="form-row hidden">
+                <div class="form-group">
+                    <label>Delivery Location *</label>
+                    <select id="deliveryLocationId">
+                        <option value="">-- Select Delivery Location --</option>
+                    </select>
+                </div>
+            </div>
+            <div id="checkoutSummary"></div>
+            <div class="button-group">
+                <button class="btn-primary" onclick="initiateOrder()" id="btnInitiate">Proceed to Pay</button>
+                <button class="btn-secondary" onclick="goToCart()">Back to Cart</button>
+            </div>
+            <div id="paymentInfo" class="hidden"></div>
+        </div>
+
+        <!-- STEP 5: Order Success -->
+        <div id="successSection" class="hidden">
+            <div class="order-success">
+                <div class="check-icon">&#10003;</div>
+                <h2>Order Placed Successfully!</h2>
+                <div id="orderSuccessContent"></div>
+                <div id="orderTokenDisplay" class="hidden" style="margin-top:15px; text-align:left; background:#f8f9fa; padding:12px; border-radius:6px;">
+                    <label style="font-size:12px;">Order Token (save this to track your order later)</label>
+                    <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
+                        <input type="text" id="successOrderToken" readonly style="background:#fff; font-size:11px; flex:1;">
+                        <button class="btn-sm btn-secondary" onclick="copyToken()">Copy</button>
+                        <button class="btn-sm btn-info" onclick="trackFromSuccess()">Track</button>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="newOrder()" style="margin-top:20px;">Place New Order</button>
+            </div>
+        </div>
+
+        <!-- Log -->
+        <div id="logSection" class="hidden" style="margin-top:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>API Log</h3>
+                <button class="btn-sm btn-secondary" onclick="document.getElementById('logOutput').textContent=''; document.getElementById('logSection').classList.add('hidden');">Clear</button>
+            </div>
+            <div class="log-output" id="logOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let sessionId = '';
+        let storeData = null;
+        let cartItems = [];
+        let searchTimeout = null;
+
+        // ===== HELPERS =====
+        function getBaseUrl() {
+            let url = document.getElementById('baseUrl').value.trim();
+            if (!url.endsWith('/')) url += '/';
+            return url;
+        }
+
+        function getHeaders() {
+            const headers = {
+                'Auth': document.getElementById('apiKey').value.trim()
+            };
+            if (sessionId) {
+                headers['X-Guest-Session'] = sessionId;
+            }
+            return headers;
+        }
+
+        function apiCall(endpoint, data = {}, callback) {
+            const url = getBaseUrl() + 'api/v1/guest/' + endpoint;
+            const formData = new FormData();
+            Object.keys(data).forEach(k => formData.append(k, data[k]));
+
+            logApi('POST ' + endpoint, data);
+
+            fetch(url, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: formData
+            })
+            .then(r => r.json())
+            .then(json => {
+                logApi('RESPONSE ' + endpoint, json);
+                callback(json);
+            })
+            .catch(err => {
+                logApi('ERROR ' + endpoint, { error: err.message });
+                showMessage('API Error: ' + err.message);
+            });
+        }
+
+        function logApi(label, data) {
+            const log = document.getElementById('logOutput');
+            const section = document.getElementById('logSection');
+            const time = new Date().toLocaleTimeString();
+            log.textContent = `[${time}] ${label}\n${JSON.stringify(data, null, 2)}\n\n` + log.textContent;
+            section.classList.remove('hidden');
+        }
+
+        function showMessage(msg, type = 'error') {
+            const c = document.getElementById('messageContainer');
+            c.innerHTML = `<div class="${type}">${msg}</div>`;
+            setTimeout(() => c.innerHTML = '', 5000);
+        }
+
+        function setStep(n) {
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById('step' + i);
+                el.className = 'step' + (i < n ? ' done' : (i === n ? ' active' : ''));
+            }
+        }
+
+        function getStoreCode() {
+            return document.getElementById('storeCode').value.trim();
+        }
+
+        // ===== STEP 1: STORE INFO =====
+        function loadStoreInfo() {
+            const storeCode = getStoreCode();
+            if (!storeCode) { showMessage('Enter a store code'); return; }
+            if (!document.getElementById('apiKey').value.trim()) { showMessage('Enter API key'); return; }
+
+            apiCall('home/store_info', { store_code: storeCode }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+
+                storeData = res.data.store;
+                const typeBadge = storeData.store_type === 'KOT'
+                    ? '<span class="badge" style="background:#fff3cd;color:#856404;margin-left:8px;">KOT</span>'
+                    : '<span class="badge" style="background:#cce5ff;color:#004085;margin-left:8px;">QSR</span>';
+                document.getElementById('storeInfoContent').innerHTML = `
+                    <div><strong>${storeData.name}</strong> (${storeData.store_code}) ${typeBadge}</div>
+                    <div style="color:#666; margin-top:4px;">${storeData.address || ''}</div>
+                    <div style="color:#666;">${storeData.company_name || ''} | ${storeData.phone || ''}</div>
+                `;
+                document.getElementById('storeInfo').classList.remove('hidden');
+                showMessage('Store connected!', 'success');
+
+                // Load delivery locations for KOT stores
+                if (storeData.store_type === 'KOT') {
+                    loadDeliveryLocations();
+                }
+
+                // Load categories + featured
+                loadCategories();
+                setStep(2);
+                document.getElementById('browseSection').classList.remove('hidden');
+            });
+        }
+
+        function loadDeliveryLocations() {
+            apiCall('orders/delivery_locations', { store_code: getStoreCode() }, function(res) {
+                if (!res.success || !res.data.locations.length) return;
+
+                const select = document.getElementById('deliveryLocationId');
+                select.innerHTML = '<option value="">-- Select Delivery Location --</option>';
+                res.data.locations.forEach(loc => {
+                    const label = [loc.name, loc.floor, loc.building].filter(Boolean).join(' - ');
+                    select.innerHTML += `<option value="${loc.id}">${label}</option>`;
+                });
+            });
+        }
+
+        // ===== STEP 2: BROWSE =====
+        function loadCategories() {
+            apiCall('home/categories', { store_code: getStoreCode() }, function(res) {
+                if (!res.success || !res.data.categories.length) {
+                    document.getElementById('categoriesContainer').innerHTML = '<div class="info">No categories found</div>';
+                    return;
+                }
+
+                let html = '<div class="category-pills">';
+                html += '<span class="category-pill active" onclick="loadFeatured(this)">Featured</span>';
+                res.data.categories.forEach(cat => {
+                    html += `<span class="category-pill" onclick="loadByCategory(${cat.id}, this)">${cat.name}</span>`;
+                });
+                html += '</div>';
+                document.getElementById('categoriesContainer').innerHTML = html;
+
+                loadFeatured(document.querySelector('.category-pill'));
+            });
+        }
+
+        function loadFeatured(el) {
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            apiCall('home/featured', { store_code: getStoreCode(), limit: 20 }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+                renderProducts(res.data.products);
+            });
+        }
+
+        function loadByCategory(categoryId, el) {
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            apiCall('catalog/products', { store_code: getStoreCode(), category_id: categoryId, per_page: 50 }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+                renderProducts(res.data.products);
+            });
+        }
+
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            const kw = document.getElementById('searchKeyword').value.trim();
+            if (kw.length >= 2) {
+                searchTimeout = setTimeout(() => searchProducts(), 500);
+            }
+        }
+
+        function searchProducts() {
+            const keyword = document.getElementById('searchKeyword').value.trim();
+            if (keyword.length < 2) { showMessage('Min 2 characters required'); return; }
+
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+
+            apiCall('catalog/search', { store_code: getStoreCode(), keyword: keyword, per_page: 50 }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+                renderProducts(res.data.products);
+            });
+        }
+
+        function renderProducts(products) {
+            if (!products || products.length === 0) {
+                document.getElementById('productsContainer').innerHTML = '<div class="info" style="margin-top:15px;">No products found</div>';
+                return;
+            }
+
+            let html = '<div class="product-grid">';
+            products.forEach(p => {
+                const inStock = p.is_in_stock !== false;
+                const vegBadge = p.is_vegetarian
+                    ? '<span class="badge badge-veg">VEG</span>'
+                    : '<span class="badge badge-nonveg">NON-VEG</span>';
+
+                html += `<div class="product-card">
+                    ${p.thumbnail ? `<img src="${p.thumbnail}" alt="${p.name}" onerror="this.style.display='none'">` : ''}
+                    <h4>${p.name} ${vegBadge}</h4>
+                    <div class="price">&#8377;${parseFloat(p.price).toFixed(2)}</div>
+                    ${!inStock ? '<div class="stock-out">Out of Stock</div>' : ''}
+                    <div style="margin-top:10px;">`;
+
+                if (p.is_in_cart) {
+                    html += `<div class="cart-actions">
+                        <button class="btn-warning btn-sm" onclick="decrementItem(${p.cart_id})">-</button>
+                        <span class="cart-qty">${p.cart_quantity}</span>
+                        <button class="btn-success btn-sm" onclick="incrementItem(${p.cart_id})">+</button>
+                    </div>`;
+                } else if (inStock) {
+                    html += `<button class="btn-primary btn-sm" onclick="addToCart(${p.id})" style="width:100%;">Add to Cart</button>`;
+                }
+
+                html += `</div></div>`;
+            });
+            html += '</div>';
+            document.getElementById('productsContainer').innerHTML = html;
+        }
+
+        // ===== CART OPERATIONS =====
+        function addToCart(productId) {
+            apiCall('cart/add', { store_code: getStoreCode(), product_id: productId, quantity: 1 }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+
+                if (res.data.is_new_session || !sessionId) {
+                    sessionId = res.data.session_id;
+                    document.getElementById('sessionId').value = sessionId;
+                }
+
+                showMessage(`${res.data.product_name} added to cart (${res.data.cart_count} items)`, 'success');
+                refreshCurrentView();
+            });
+        }
+
+        function incrementItem(cartId) {
+            apiCall('cart/increment', { cart_id: cartId }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+                refreshCurrentView();
+            });
+        }
+
+        function decrementItem(cartId) {
+            apiCall('cart/decrement', { cart_id: cartId }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+                refreshCurrentView();
+            });
+        }
+
+        function removeItem(cartId) {
+            apiCall('cart/remove', { cart_id: cartId }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+                showMessage('Item removed', 'success');
+                loadCart();
+            });
+        }
+
+        function refreshCurrentView() {
+            // Reload whichever product view is active
+            const activePill = document.querySelector('.category-pill.active');
+            if (activePill) {
+                activePill.click();
+            }
+            // Also refresh cart if visible
+            if (!document.getElementById('cartSection').classList.contains('hidden')) {
+                loadCart();
+            }
+        }
+
+        // ===== STEP 3: CART =====
+        function goToCart() {
+            if (!sessionId) { showMessage('Add something to cart first'); return; }
+            setStep(3);
+            document.getElementById('browseSection').classList.add('hidden');
+            document.getElementById('paymentSection').classList.add('hidden');
+            document.getElementById('cartSection').classList.remove('hidden');
+            loadCart();
+        }
+
+        function goToBrowse() {
+            setStep(2);
+            document.getElementById('cartSection').classList.add('hidden');
+            document.getElementById('paymentSection').classList.add('hidden');
+            document.getElementById('browseSection').classList.remove('hidden');
+            refreshCurrentView();
+        }
+
+        function loadCart() {
+            apiCall('cart/list_items', { store_code: getStoreCode() }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+
+                const data = res.data;
+                if (!data.items || data.items.length === 0) {
+                    document.getElementById('cartContent').innerHTML = '<div class="info">Your cart is empty</div>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead><tbody>';
+                data.items.forEach(item => {
+                    const stockWarn = !item.is_in_stock ? ' <span class="badge badge-danger">Low Stock</span>' : '';
+                    html += `<tr>
+                        <td>
+                            <strong>${item.product_name}</strong>${stockWarn}
+                            ${item.is_vegetarian ? ' <span class="badge badge-veg">VEG</span>' : ''}
+                            ${item.note ? '<br><small style="color:#888;">Note: ' + item.note + '</small>' : ''}
+                        </td>
+                        <td>&#8377;${parseFloat(item.unit_price).toFixed(2)}</td>
+                        <td>
+                            <div class="cart-actions">
+                                <button class="btn-warning btn-sm" onclick="decrementItem(${item.cart_id})">-</button>
+                                <span class="cart-qty">${item.quantity}</span>
+                                <button class="btn-success btn-sm" onclick="incrementItem(${item.cart_id})">+</button>
+                            </div>
+                        </td>
+                        <td><strong>&#8377;${parseFloat(item.total).toFixed(2)}</strong></td>
+                        <td><button class="btn-danger btn-sm" onclick="removeItem(${item.cart_id})">&#10005;</button></td>
+                    </tr>`;
+                });
+                html += '</tbody></table>';
+
+                const s = data.summary;
+                html += `<div style="max-width:350px; margin-left:auto; margin-top:20px;">
+                    <div class="summary-row"><span>Subtotal</span><span>&#8377;${s.formatted.subtotal}</span></div>
+                    <div class="summary-row"><span>Tax (GST)</span><span>&#8377;${s.formatted.tax_amount}</span></div>
+                    <div class="summary-row total"><span>Total</span><span>&#8377;${s.formatted.total_amount}</span></div>
+                </div>`;
+
+                if (data.has_stock_issue) {
+                    html += '<div class="error" style="margin-top:15px;">Some items have stock issues. Please adjust quantities.</div>';
+                }
+
+                html += `<div class="button-group" style="margin-top:20px;">
+                    <button class="btn-primary" onclick="goToCheckout()" ${data.has_stock_issue ? 'disabled' : ''}>Proceed to Checkout</button>
+                    <button class="btn-secondary" onclick="goToBrowse()">Continue Shopping</button>
+                </div>`;
+
+                document.getElementById('cartContent').innerHTML = html;
+            });
+        }
+
+        // ===== STEP 4: CHECKOUT =====
+        function goToCheckout() {
+            setStep(4);
+            document.getElementById('cartSection').classList.add('hidden');
+            document.getElementById('paymentSection').classList.remove('hidden');
+
+            // Show delivery location for KOT stores
+            if (storeData && storeData.store_type === 'KOT') {
+                document.getElementById('deliveryLocationRow').classList.remove('hidden');
+            } else {
+                document.getElementById('deliveryLocationRow').classList.add('hidden');
+            }
+
+            // Load cart summary for checkout view
+            apiCall('cart/list_items', { store_code: getStoreCode() }, function(res) {
+                if (!res.success || !res.data.items.length) {
+                    showMessage('Cart is empty');
+                    goToCart();
+                    return;
+                }
+
+                const data = res.data;
+                const s = data.summary;
+                let html = '<div class="section" style="margin-bottom:15px;"><h3>Order Summary</h3>';
+                data.items.forEach(item => {
+                    html += `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #eee;">
+                        <span>${item.product_name} x${item.quantity}</span>
+                        <span>&#8377;${parseFloat(item.total).toFixed(2)}</span>
+                    </div>`;
+                });
+                html += `<div style="margin-top:10px;">
+                    <div class="summary-row"><span>Subtotal</span><span>&#8377;${s.formatted.subtotal}</span></div>
+                    <div class="summary-row"><span>Tax (GST)</span><span>&#8377;${s.formatted.tax_amount}</span></div>
+                    <div class="summary-row total"><span>Amount to Pay</span><span>&#8377;${s.formatted.amount_payable}</span></div>
+                </div></div>`;
+                document.getElementById('checkoutSummary').innerHTML = html;
+            });
+        }
+
+        function initiateOrder() {
+            const name = document.getElementById('guestName').value.trim();
+            const phone = document.getElementById('guestPhone').value.trim();
+
+            if (!name) { showMessage('Please enter your name'); return; }
+            if (!phone || phone.length < 10) { showMessage('Please enter a valid 10-digit phone number'); return; }
+
+            // KOT: validate delivery location
+            const isKOT = storeData && storeData.store_type === 'KOT';
+            const locationId = document.getElementById('deliveryLocationId').value;
+            if (isKOT && !locationId) {
+                showMessage('Please select a delivery location');
+                return;
+            }
+
+            document.getElementById('btnInitiate').disabled = true;
+            document.getElementById('btnInitiate').textContent = 'Processing...';
+
+            const params = {
+                store_code: getStoreCode(),
+                guest_name: name,
+                guest_phone: phone
+            };
+            if (isKOT && locationId) {
+                params.delivery_location_id = locationId;
+            }
+
+            apiCall('orders/initiate', params, function(res) {
+                document.getElementById('btnInitiate').disabled = false;
+                document.getElementById('btnInitiate').textContent = 'Proceed to Pay';
+
+                if (!res.success) { showMessage(res.message); return; }
+
+                const data = res.data;
+
+                // Open Razorpay checkout
+                openRazorpay(data);
+            });
+        }
+
+        function openRazorpay(data) {
+            const options = {
+                key: data.razorpay_key,
+                amount: Math.round(data.amount * 100), // Razorpay expects paise
+                currency: data.currency || 'INR',
+                name: storeData ? storeData.name : 'Joy Foods',
+                description: 'Guest ' + (storeData ? storeData.store_type : 'QSR') + ' Order',
+                order_id: data.razorpay_order_id,
+                prefill: {
+                    name: data.guest_name,
+                    contact: data.guest_phone
+                },
+                theme: { color: '#BD3839' },
+                handler: function(response) {
+                    handlePaymentSuccess(response);
+                },
+                modal: {
+                    ondismiss: function() {
+                        showMessage('Payment cancelled. You can try again.', 'info');
+                        logApi('PAYMENT CANCELLED', { message: 'User dismissed Razorpay modal' });
+                    }
+                }
+            };
+
+            try {
+                const rzp = new Razorpay(options);
+                rzp.on('payment.failed', function(response) {
+                    showMessage('Payment failed: ' + response.error.description);
+                    logApi('PAYMENT FAILED', response.error);
+                });
+                rzp.open();
+            } catch (e) {
+                showMessage('Failed to open payment: ' + e.message);
+            }
+        }
+
+        function handlePaymentSuccess(response) {
+            showMessage('Payment successful! Completing order...', 'success');
+            logApi('PAYMENT SUCCESS', response);
+
+            apiCall('orders/complete', {
+                store_code: getStoreCode(),
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+            }, function(res) {
+                if (!res.success) {
+                    showMessage('Order completion failed: ' + res.message);
+                    // Show manual complete info
+                    document.getElementById('paymentInfo').innerHTML = `
+                        <div class="error" style="margin-top:15px;">
+                            <strong>Payment was successful but order creation failed.</strong><br>
+                            Payment ID: ${response.razorpay_payment_id}<br>
+                            Order ID: ${response.razorpay_order_id}<br>
+                            Please contact support with these details.
+                        </div>`;
+                    document.getElementById('paymentInfo').classList.remove('hidden');
+                    return;
+                }
+
+                // Show success
+                showOrderSuccess(res.data);
+            });
+        }
+
+        // ===== STEP 5: SUCCESS =====
+        function showOrderSuccess(data) {
+            setStep(5);
+            document.getElementById('paymentSection').classList.add('hidden');
+            document.getElementById('successSection').classList.remove('hidden');
+
+            const order = data.order;
+            const pricing = data.pricing;
+            const payment = data.payment;
+            const deliveryLoc = data.delivery_location;
+
+            let locationHtml = '';
+            if (deliveryLoc) {
+                const locLabel = [deliveryLoc.name, deliveryLoc.floor, deliveryLoc.building].filter(Boolean).join(' - ');
+                locationHtml = `<div><strong>Deliver To:</strong> ${locLabel}</div>`;
+            }
+
+            document.getElementById('orderSuccessContent').innerHTML = `
+                <div class="order-number">${order.order_number}</div>
+                <div style="margin-top:10px; color:#666;">Show this pickup code at the counter:</div>
+                <div class="pickup-code">${order.pickup_code}</div>
+                <div style="margin-top:15px;">
+                    <div><strong>Name:</strong> ${order.guest_name}</div>
+                    <div><strong>Phone:</strong> ${order.guest_phone}</div>
+                    ${locationHtml}
+                    <div><strong>Status:</strong> <span class="badge badge-info">${order.status}</span></div>
+                    <div><strong>Payment:</strong> <span class="badge badge-success">${payment.status}</span></div>
+                    <div style="margin-top:10px; font-size:18px;"><strong>Amount Paid: &#8377;${pricing.formatted_online_paid}</strong></div>
+                </div>
+            `;
+
+            // Show order token if available
+            if (order.order_token) {
+                document.getElementById('successOrderToken').value = order.order_token;
+                document.getElementById('orderTokenDisplay').classList.remove('hidden');
+            }
+        }
+
+        function copyToken() {
+            const input = document.getElementById('successOrderToken');
+            input.select();
+            navigator.clipboard.writeText(input.value).then(() => {
+                showMessage('Token copied to clipboard!', 'success');
+            });
+        }
+
+        function trackFromSuccess() {
+            const token = document.getElementById('successOrderToken').value;
+            if (!token) return;
+            document.getElementById('orderToken').value = token;
+            trackOrder();
+        }
+
+        // ===== ORDER TRACKING =====
+        function trackOrder() {
+            const token = document.getElementById('orderToken').value.trim();
+            if (!token) { showMessage('Please enter an order token'); return; }
+            if (!document.getElementById('apiKey').value.trim()) { showMessage('Enter API key first'); return; }
+
+            apiCall('orders/details', { order_token: token }, function(res) {
+                if (!res.success) { showMessage(res.message); return; }
+                renderTracking(res.data);
+            });
+        }
+
+        function renderTracking(data) {
+            // Hide other sections, show tracking
+            document.getElementById('browseSection').classList.add('hidden');
+            document.getElementById('cartSection').classList.add('hidden');
+            document.getElementById('paymentSection').classList.add('hidden');
+            document.getElementById('successSection').classList.add('hidden');
+
+            // API returns everything nested inside data.order
+            const order = data.order;
+            const pricing = order.pricing;
+            const store = order.store;
+            const items = order.items;
+            const statuses = order.statuses;
+
+            // Status timeline
+            let timelineHtml = '<div class="timeline">';
+            statuses.forEach((s, i) => {
+                let dotClass = 'timeline-dot';
+                let labelClass = 'timeline-label';
+                const completed = s.is_completed || s.reached;
+                const isFailed = s.code === 'rejected' || s.code === 'cancelled';
+
+                if (s.is_current) {
+                    dotClass += isFailed ? ' failed' : ' current';
+                    labelClass += ' active';
+                } else if (completed) {
+                    dotClass += ' reached';
+                    labelClass += ' active';
+                }
+
+                const icon = completed ? '&#10003;' : (s.is_current ? '&#9679;' : (i + 1));
+                timelineHtml += `<div class="timeline-step">
+                    <div class="${dotClass}">${icon}</div>
+                    <div class="${labelClass}">${s.text || s.label}</div>
+                    ${s.time ? `<div class="timeline-time">${s.time}</div>` : ''}
+                </div>`;
+            });
+            timelineHtml += '</div>';
+
+            // Items list
+            let itemsHtml = '';
+            items.forEach(item => {
+                const veg = item.is_vegetarian ? '<span class="badge badge-veg" style="font-size:9px;">VEG</span>' : '';
+                itemsHtml += `<div class="tracking-item">
+                    <span>${item.name || item.product_name} ${veg} <span style="color:#888;">x${item.quantity}</span></span>
+                    <span style="font-weight:600;">&#8377;${parseFloat(item.total_price || item.total_amount || 0).toFixed(2)}</span>
+                </div>`;
+            });
+
+            // Refund section
+            let refundHtml = '';
+            if (order.refund && order.refund.amount > 0) {
+                const r = order.refund;
+                refundHtml = `<div class="tracking-card" style="border-left:4px solid #ffc107;">
+                    <h4 style="margin:0 0 10px; color:#856404;">Refund Information</h4>
+                    <div class="tracking-item"><span>Method</span><span>${r.method}</span></div>
+                    <div class="tracking-item"><span>Amount</span><span style="color:#28a745; font-weight:700;">&#8377;${parseFloat(r.amount).toFixed(2)}</span></div>
+                    <div class="tracking-item"><span>Status</span><span>${r.status}</span></div>
+                </div>`;
+            }
+
+            const html = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3 style="margin:0;">Order Tracking</h3>
+                    <button class="btn-sm btn-secondary" onclick="closeTracking()">Close</button>
+                </div>
+
+                <div class="tracking-card">
+                    <div class="tracking-header">
+                        <div>
+                            <div style="font-size:20px; font-weight:700;">${order.order_number}</div>
+                            <div style="color:#888; font-size:12px; margin-top:4px;">${order.formatted_date || order.created_at}</div>
+                        </div>
+                        <span class="tracking-status" style="background:${order.status_color || '#6c757d'};">${order.status_label || order.status}</span>
+                    </div>
+
+                    ${timelineHtml}
+
+                    ${order.pickup_code ? `<div style="text-align:center; margin:15px 0; padding:12px; background:#fff5f5; border-radius:8px;">
+                        <div style="color:#888; font-size:11px;">PICKUP CODE</div>
+                        <div style="font-size:28px; font-weight:700; color:#BD3839; letter-spacing:6px;">${order.pickup_code}</div>
+                    </div>` : ''}
+                </div>
+
+                <div class="tracking-card">
+                    <h4 style="margin:0 0 10px;">Items</h4>
+                    <div class="tracking-items">${itemsHtml}</div>
+                    <div style="margin-top:10px; padding-top:10px; border-top:2px solid #f0f0f0;">
+                        <div class="summary-row"><span>Subtotal</span><span>&#8377;${pricing.formatted_subtotal || parseFloat(pricing.subtotal).toFixed(2)}</span></div>
+                        <div class="summary-row"><span>Tax (GST)</span><span>&#8377;${pricing.formatted_tax || parseFloat(pricing.tax).toFixed(2)}</span></div>
+                        <div class="summary-row total"><span>Total</span><span>&#8377;${pricing.formatted_total || parseFloat(pricing.total).toFixed(2)}</span></div>
+                        ${pricing.online_paid ? `<div class="summary-row" style="color:#28a745;"><span>Paid Online</span><span>&#8377;${pricing.formatted_online_paid || parseFloat(pricing.online_paid).toFixed(2)}</span></div>` : ''}
+                    </div>
+                </div>
+
+                ${order.delivery_location ? `<div class="tracking-card" style="border-left:4px solid #17a2b8;">
+                    <h4 style="margin:0 0 10px;">Delivery Location</h4>
+                    <div class="tracking-item"><span>Location</span><span>${order.delivery_location.name}</span></div>
+                    ${order.delivery_location.floor ? `<div class="tracking-item"><span>Floor</span><span>${order.delivery_location.floor}</span></div>` : ''}
+                    ${order.delivery_location.building ? `<div class="tracking-item"><span>Building</span><span>${order.delivery_location.building}</span></div>` : ''}
+                </div>` : ''}
+
+                ${order.guest ? `<div class="tracking-card">
+                    <h4 style="margin:0 0 10px;">Guest Details</h4>
+                    <div class="tracking-item"><span>Name</span><span>${order.guest.name}</span></div>
+                    <div class="tracking-item"><span>Phone</span><span>${order.guest.phone}</span></div>
+                </div>` : ''}
+
+                ${store ? `<div class="tracking-card">
+                    <h4 style="margin:0 0 10px;">Store</h4>
+                    <div class="tracking-item"><span>Name</span><span>${store.name}${store.store_type ? ' <span class="badge" style="background:#e9ecef;color:#666;font-size:10px;">' + store.store_type + '</span>' : ''}</span></div>
+                    ${store.address ? `<div class="tracking-item"><span>Address</span><span>${store.address}</span></div>` : ''}
+                    ${store.phone ? `<div class="tracking-item"><span>Phone</span><span>${store.phone}</span></div>` : ''}
+                </div>` : ''}
+
+                ${refundHtml}
+
+                <div style="text-align:center; margin-top:20px;">
+                    <button class="btn-info" onclick="trackOrder()" style="margin-right:10px;">Refresh Status</button>
+                    <button class="btn-secondary" onclick="closeTracking()">Close</button>
+                </div>
+            `;
+
+            document.getElementById('trackingSection').innerHTML = html;
+            document.getElementById('trackingSection').classList.remove('hidden');
+        }
+
+        function closeTracking() {
+            document.getElementById('trackingSection').classList.add('hidden');
+            document.getElementById('trackingSection').innerHTML = '';
+        }
+
+        function newOrder() {
+            sessionId = '';
+            document.getElementById('sessionId').value = '';
+            document.getElementById('guestName').value = '';
+            document.getElementById('guestPhone').value = '';
+            document.getElementById('deliveryLocationId').value = '';
+            document.getElementById('successSection').classList.add('hidden');
+            document.getElementById('orderTokenDisplay').classList.add('hidden');
+            document.getElementById('browseSection').classList.remove('hidden');
+            setStep(2);
+            refreshCurrentView();
+        }
+
+        function clearAll() {
+            sessionId = '';
+            storeData = null;
+            document.getElementById('sessionId').value = '';
+            document.getElementById('orderToken').value = '';
+            document.getElementById('deliveryLocationId').value = '';
+            document.getElementById('deliveryLocationRow').classList.add('hidden');
+            document.getElementById('storeInfo').classList.add('hidden');
+            document.getElementById('browseSection').classList.add('hidden');
+            document.getElementById('cartSection').classList.add('hidden');
+            document.getElementById('paymentSection').classList.add('hidden');
+            document.getElementById('successSection').classList.add('hidden');
+            document.getElementById('trackingSection').classList.add('hidden');
+            document.getElementById('trackingSection').innerHTML = '';
+            document.getElementById('logSection').classList.add('hidden');
+            document.getElementById('logOutput').textContent = '';
+            document.getElementById('messageContainer').innerHTML = '';
+            setStep(1);
+        }
+
+        // Cart button in header area (floating)
+        document.addEventListener('DOMContentLoaded', function() {
+            const cartBtn = document.createElement('button');
+            cartBtn.className = 'btn-success';
+            cartBtn.style.cssText = 'position:fixed; bottom:20px; right:20px; border-radius:50%; width:60px; height:60px; font-size:24px; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:999;';
+            cartBtn.innerHTML = '&#128722;';
+            cartBtn.title = 'View Cart';
+            cartBtn.onclick = goToCart;
+            document.body.appendChild(cartBtn);
+        });
+    </script>
+</body>
+</html>

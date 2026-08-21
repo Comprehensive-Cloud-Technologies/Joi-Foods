@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy Foods - PREMEAL Payment Tester</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #28a745;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-premeal {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        textarea:focus {
+            border-color: #28a745;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-success {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #138496;
+        }
+
+        .order-details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+
+        .order-details h3 {
+            margin-top: 0;
+            color: #28a745;
+        }
+
+        .detail-item {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .dates-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .date-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            background-color: #fff;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        .date-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .date-label {
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .date-day {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .date-amount {
+            text-align: right;
+        }
+
+        .company-contrib {
+            font-size: 12px;
+            color: #17a2b8;
+        }
+
+        .employee-share {
+            font-weight: 600;
+            color: #BD3839;
+        }
+
+        .summary-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #28a745;
+        }
+
+        .total-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #28a745;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .log-container {
+            margin-top: 20px;
+        }
+
+        .log-output {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            background-color: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #138496;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .razorpay-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .razorpay-info h4 {
+            margin-top: 0;
+            color: #084298;
+        }
+
+        .wallet-info {
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .wallet-info h4 {
+            margin-top: 0;
+            color: #0f5132;
+        }
+
+        .complete-payload {
+            background-color: #fff3cd;
+            border: 1px solid #ffecb5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .complete-payload h4 {
+            margin-top: 0;
+            color: #664d03;
+        }
+
+        .complete-payload pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        .product-card {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .product-card h4 {
+            margin: 0 0 10px 0;
+        }
+
+        .product-card .meal-type {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Joy Foods - PREMEAL Payment Tester <span class="badge badge-premeal">PREMEAL</span></h1>
+
+        <div class="form-group">
+            <label for="jsonInput">Paste premeal_order API response here:</label>
+            <textarea id="jsonInput" placeholder="Paste your JSON response from /api/v1/user/orders/premeal_order here..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="parseAndShowDetails()">Parse & Show Order Details</button>
+            <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <div id="orderDetails" class="order-details hidden">
+            <h3>PREMEAL Order Details</h3>
+            <div id="detailsContent"></div>
+
+            <div class="razorpay-info" id="razorpayInfo">
+                <h4>Razorpay Payment Required</h4>
+                <p>Click the button below to open Razorpay checkout:</p>
+                <button class="btn-primary" onclick="processPayment()" style="margin-top: 10px;">
+                    Pay Now
+                </button>
+            </div>
+
+            <div class="wallet-info" id="walletOnlyInfo" style="display: none;">
+                <h4>Wallet Payment Only</h4>
+                <p>No online payment required. Order will be completed using wallet balance.</p>
+                <p><strong>Orders have been created successfully!</strong></p>
+            </div>
+        </div>
+
+        <div id="paymentResponse" class="complete-payload hidden">
+            <h4>Payment Response - Use this for premeal_complete API</h4>
+            <pre id="completePayload"></pre>
+            <button class="copy-btn" onclick="copyPayload()">Copy Payload</button>
+        </div>
+
+        <div id="logContainer" class="log-container hidden">
+            <h3>Payment Log</h3>
+            <div id="logOutput" class="log-output"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = null;
+        let pendingOrderId = null;
+
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function parseAndShowDetails() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+
+            if (!jsonInput) {
+                showMessage('Please paste your JSON data first.');
+                return;
+            }
+
+            try {
+                const response = JSON.parse(jsonInput);
+
+                if (!response.success || !response.data) {
+                    showMessage('API response indicates failure: ' + (response.message || 'Unknown error'));
+                    return;
+                }
+
+                currentData = response.data;
+                pendingOrderId = currentData.pending_order_id || null;
+                displayOrderDetails(currentData);
+                showMessage('JSON parsed successfully!', 'success');
+
+            } catch (error) {
+                showMessage(`Invalid JSON format: ${error.message}`);
+            }
+        }
+
+        function displayOrderDetails(data) {
+            const detailsContent = document.getElementById('detailsContent');
+
+            // Check if this is a payment required response or orders created response
+            const isPaymentRequired = data.payment_required === true;
+            const hasOrders = data.orders && data.orders.length > 0;
+
+            let html = '';
+
+            if (isPaymentRequired && data.razorpay) {
+                // Payment required - show summary
+                const summary = data.summary;
+
+                html = `
+                    <div class="product-card">
+                        <h4>Scheduled Meals</h4>
+                        <span class="meal-type">${summary.total_days} day(s)</span>
+                    </div>
+
+                    <div class="summary-section">
+                        <div class="detail-item">
+                            <span class="detail-label">Total Days:</span>
+                            <span class="detail-value">${summary.total_days}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Company Contribution:</span>
+                            <span class="detail-value" style="color: #17a2b8;">₹${summary.total_company_contribution.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Your Share:</span>
+                            <span class="detail-value">₹${summary.total_employee_share.toFixed(2)}</span>
+                        </div>
+                        ${summary.coupon_discount > 0 ? `
+                        <div class="detail-item">
+                            <span class="detail-label">Coupon Discount:</span>
+                            <span class="detail-value" style="color: green;">-₹${summary.coupon_discount.toFixed(2)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="detail-item">
+                            <span class="detail-label">Wallet to Use:</span>
+                            <span class="detail-value" style="color: blue;">₹${summary.wallet_to_use.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-item total-amount">
+                            <span class="detail-label">Online Payment:</span>
+                            <span class="detail-value">₹${summary.gateway_amount.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('razorpayInfo').style.display = 'block';
+                document.getElementById('walletOnlyInfo').style.display = 'none';
+
+            } else if (hasOrders) {
+                // Orders created - show order list
+                let ordersHtml = '<div class="dates-section"><strong>Booked Orders:</strong>';
+
+                // Show primary order ID if available
+                if (data.primary_order_id) {
+                    ordersHtml += `<div style="background: #d4edda; padding: 8px; border-radius: 4px; margin: 10px 0;">
+                        <strong>Primary Order ID:</strong> ${data.primary_order_id}
+                    </div>`;
+                }
+
+                data.orders.forEach((order, index) => {
+                    const orderType = order.is_primary ? '<span style="background:#28a745;color:white;padding:2px 8px;border-radius:10px;font-size:11px;">PRIMARY</span>' :
+                        `<span style="background:#6c757d;color:white;padding:2px 8px;border-radius:10px;font-size:11px;">Child of #${order.parent_order_id}</span>`;
+
+                    ordersHtml += `
+                        <div class="date-row">
+                            <div class="date-info">
+                                <span class="date-label">${order.scheduled_date} ${orderType}</span>
+                                <span class="date-day">${order.meal_type} - Pickup: ${order.pickup_time || 'N/A'}</span>
+                                <span class="date-day">Order #${order.order_number}</span>
+                                <span class="date-day">Pickup Code: <strong>${order.pickup_code}</strong></span>
+                                <span class="date-day">Status: <strong>${order.status}</strong></span>
+                            </div>
+                            <div class="date-amount">
+                                <div class="company-contrib">Company: ₹${order.company_contribution.toFixed(2)}</div>
+                                <div class="employee-share">You Paid: ₹${order.employee_paid.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                ordersHtml += '</div>';
+
+                const paymentSummary = data.payment_summary;
+                html = `
+                    ${ordersHtml}
+
+                    <div class="summary-section">
+                        <div class="detail-item">
+                            <span class="detail-label">Total Company Contribution:</span>
+                            <span class="detail-value" style="color: #17a2b8;">₹${paymentSummary.total_company_contribution.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Total You Paid:</span>
+                            <span class="detail-value">₹${paymentSummary.total_employee_paid.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Wallet Used:</span>
+                            <span class="detail-value" style="color: blue;">₹${paymentSummary.wallet_used.toFixed(2)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Gateway Paid:</span>
+                            <span class="detail-value">₹${paymentSummary.gateway_paid.toFixed(2)}</span>
+                        </div>
+                        ${paymentSummary.coupon_discount > 0 ? `
+                        <div class="detail-item">
+                            <span class="detail-label">Coupon Discount:</span>
+                            <span class="detail-value" style="color: green;">₹${paymentSummary.coupon_discount.toFixed(2)}</span>
+                        </div>
+                        ` : ''}
+                        <div class="detail-item total-amount">
+                            <span class="detail-label">Payment Status:</span>
+                            <span class="detail-value">${paymentSummary.payment_status}</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-item" style="margin-top: 15px;">
+                        <span class="detail-label">Wallet Balance After:</span>
+                        <span class="detail-value">₹${data.wallet_balance_after.toFixed(2)}</span>
+                    </div>
+                `;
+
+                document.getElementById('razorpayInfo').style.display = 'none';
+                document.getElementById('walletOnlyInfo').style.display = 'block';
+            }
+
+            detailsContent.innerHTML = html;
+            document.getElementById('orderDetails').classList.remove('hidden');
+        }
+
+        function processPayment() {
+            if (!currentData || !currentData.razorpay) {
+                showMessage('No Razorpay payment data available.');
+                return;
+            }
+
+            const razorpayData = currentData.razorpay;
+
+            const options = {
+                key: razorpayData.key,
+                amount: razorpayData.amount,
+                currency: razorpayData.currency || 'INR',
+                name: razorpayData.name,
+                description: razorpayData.description,
+                order_id: razorpayData.order_id,
+                prefill: razorpayData.prefill,
+                theme: razorpayData.theme,
+                handler: function (response) {
+                    handlePaymentSuccess(response);
+                },
+                modal: {
+                    ondismiss: function() {
+                        logMessage('Payment cancelled by user', 'WARNING');
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+
+            rzp.on('payment.failed', function (response) {
+                handlePaymentFailure(response.error);
+            });
+
+            rzp.open();
+        }
+
+        function handlePaymentSuccess(response) {
+            const payload = {
+                pending_order_id: pendingOrderId,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+            };
+
+            showCompletePayload(payload);
+
+            logMessage(`
+=== PAYMENT SUCCESS ===
+Timestamp: ${new Date().toISOString()}
+Payment ID: ${response.razorpay_payment_id}
+Order ID: ${response.razorpay_order_id}
+Signature: ${response.razorpay_signature}
+Pending Order ID: ${pendingOrderId}
+
+Use the payload above to call premeal_complete API
+===========================
+            `, 'SUCCESS');
+
+            showMessage('Payment successful! Copy the payload below for premeal_complete API.', 'success');
+        }
+
+        function handlePaymentFailure(error) {
+            logMessage(`
+=== PAYMENT FAILED ===
+Timestamp: ${new Date().toISOString()}
+Error Code: ${error.code}
+Description: ${error.description}
+Source: ${error.source}
+Step: ${error.step}
+Reason: ${error.reason}
+===========================
+            `, 'FAILED');
+
+            showMessage('Payment failed: ' + error.description);
+        }
+
+        function showCompletePayload(payload) {
+            document.getElementById('completePayload').textContent = JSON.stringify(payload, null, 2);
+            document.getElementById('paymentResponse').classList.remove('hidden');
+        }
+
+        function copyPayload() {
+            const payload = document.getElementById('completePayload').textContent;
+            navigator.clipboard.writeText(payload).then(() => {
+                showMessage('Payload copied to clipboard!', 'success');
+            }).catch(err => {
+                showMessage('Failed to copy: ' + err);
+            });
+        }
+
+        function logMessage(message, status = 'INFO') {
+            const logOutput = document.getElementById('logOutput');
+            const logContainer = document.getElementById('logContainer');
+
+            logOutput.textContent = message + '\n' + logOutput.textContent;
+            logContainer.classList.remove('hidden');
+            logContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearAll() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('messageContainer').innerHTML = '';
+            document.getElementById('orderDetails').classList.add('hidden');
+            document.getElementById('paymentResponse').classList.add('hidden');
+            document.getElementById('logContainer').classList.add('hidden');
+            document.getElementById('logOutput').textContent = '';
+            document.getElementById('completePayload').textContent = '';
+            currentData = null;
+            pendingOrderId = null;
+        }
+
+        // Sample data for reference
+        window.onload = function() {
+            const samplePaymentRequired = `{
+    "status": 200,
+    "success": true,
+    "message": "Payment required to complete scheduling",
+    "data": {
+        "payment_required": true,
+        "pending_order_id": 123,
+        "razorpay": {
+            "key": "rzp_test_xxxxx",
+            "amount": 18000,
+            "currency": "INR",
+            "name": "Joy Foods",
+            "description": "PREMEAL Order - 3 meals",
+            "order_id": "order_ABC123XYZ",
+            "prefill": {
+                "name": "John Doe",
+                "email": "john@example.com",
+                "contact": "9876543210"
+            },
+            "theme": {
+                "color": "#BD3839"
+            }
+        },
+        "summary": {
+            "total_days": 3,
+            "total_company_contribution": 630.00,
+            "total_employee_share": 270.00,
+            "coupon_discount": 0.00,
+            "wallet_to_use": 90.00,
+            "gateway_amount": 180.00
+        }
+    }
+}`;
+
+            const sampleOrdersCreated = `{
+    "status": 200,
+    "success": true,
+    "message": "3 meal(s) booked successfully",
+    "data": {
+        "primary_order_id": 101,
+        "orders": [
+            {
+                "order_id": 101,
+                "order_number": "PM-20260105-101",
+                "scheduled_date": "2026-01-05",
+                "meal_type": "LUNCH",
+                "pickup_time": "12:30",
+                "pickup_code": "ABC123",
+                "status": "PENDING",
+                "is_primary": true,
+                "parent_order_id": null,
+                "total_amount": 300.00,
+                "company_contribution": 210.00,
+                "employee_paid": 81.00
+            },
+            {
+                "order_id": 102,
+                "order_number": "PM-20260106-102",
+                "scheduled_date": "2026-01-06",
+                "meal_type": "LUNCH",
+                "pickup_time": "12:30",
+                "pickup_code": "DEF456",
+                "status": "PENDING",
+                "is_primary": false,
+                "parent_order_id": 101,
+                "total_amount": 300.00,
+                "company_contribution": 210.00,
+                "employee_paid": 81.00
+            }
+        ],
+        "payment_summary": {
+            "total_company_contribution": 420.00,
+            "total_employee_paid": 162.00,
+            "wallet_used": 100.00,
+            "gateway_paid": 62.00,
+            "coupon_discount": 18.00,
+            "payment_status": "COMPLETED"
+        },
+        "wallet_balance_after": 400.00
+    }
+}`;
+
+            document.getElementById('jsonInput').placeholder =
+                'Paste your premeal_order API response here...\n\n' +
+                'This page handles two types of responses:\n' +
+                '1. Payment Required - with razorpay object (needs payment)\n' +
+                '2. Orders Created - with orders array (wallet covered all)\n\n' +
+                'Sample Payment Required:\n' + samplePaymentRequired.substring(0, 300) + '...';
+        };
+    </script>
+</body>
+</html>

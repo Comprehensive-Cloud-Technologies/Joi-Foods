@@ -1,0 +1,49 @@
+# CodeIgniter .gitignore
+
+# Session files (ignore all files in session directory)
+tmp/*
+!tmp/.htaccess
+!tmp/index.html
+
+# Alternative: If you only want to ignore session files specifically
+# tmp/ci_session*
+
+# CodeIgniter specific files
+application/logs/*
+!application/logs/index.html
+!application/logs/.htaccess
+
+application/cache/*
+!application/cache/index.html
+!application/cache/.htaccess
+
+# User uploaded files (if any)
+uploads/*
+!uploads/index.html
+
+# Environment files
+.env
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.claude/
+
+# Backup files
+*.bak
+*.tmp
+*.swp
+*~
+
+zbit_local

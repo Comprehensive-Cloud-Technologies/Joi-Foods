@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joy Foods - Razorpay Payment Tester</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #BD3839;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        textarea:focus {
+            border-color: #BD3839;
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #BD3839;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #a02e2f;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .order-details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border-left: 4px solid #BD3839;
+        }
+
+        .order-details h3 {
+            margin-top: 0;
+            color: #BD3839;
+        }
+
+        .detail-item {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .items-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .item-name {
+            font-weight: 500;
+        }
+
+        .item-qty {
+            color: #666;
+        }
+
+        .summary-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #BD3839;
+        }
+
+        .total-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #BD3839;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .log-container {
+            margin-top: 20px;
+        }
+
+        .log-output {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .copy-btn {
+            background-color: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: #138496;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .razorpay-info {
+            background-color: #e7f3ff;
+            border: 1px solid #b6d4fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .razorpay-info h4 {
+            margin-top: 0;
+            color: #084298;
+        }
+
+        .complete-payload {
+            background-color: #fff3cd;
+            border: 1px solid #ffecb5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .complete-payload h4 {
+            margin-top: 0;
+            color: #664d03;
+        }
+
+        .complete-payload pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Joy Foods - Razorpay Payment Tester</h1>
+
+        <div class="form-group">
+            <label for="jsonInput">Paste qsr_initiate API response here:</label>
+            <textarea id="jsonInput" placeholder="Paste your JSON response from /api/v1/user/orders/qsr_initiate here..."></textarea>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="parseAndShowDetails()">Parse & Show Order Details</button>
+            <button class="btn-secondary" onclick="clearAll()">Clear All</button>
+        </div>
+
+        <div id="messageContainer"></div>
+
+        <div id="orderDetails" class="order-details hidden">
+            <h3>Order Details</h3>
+            <div id="detailsContent"></div>
+
+            <div class="razorpay-info" id="razorpayInfo">
+                <h4>Razorpay Payment</h4>
+                <p>Click the button below to open Razorpay checkout:</p>
+                <button class="btn-primary" onclick="processPayment()" style="margin-top: 10px;">
+                    Pay Now
+                </button>
+            </div>
+
+            <div class="razorpay-info" id="walletOnlyInfo" style="display: none;">
+                <h4>Wallet Payment</h4>
+                <p>No online payment required. Order will be paid using wallet balance.</p>
+                <button class="btn-success" onclick="simulateWalletPayment()" style="margin-top: 10px;">
+                    Complete Order (Wallet Only)
+                </button>
+            </div>
+        </div>
+
+        <div id="paymentResponse" class="complete-payload hidden">
+            <h4>Payment Response - Use this for qsr_complete API</h4>
+            <pre id="completePayload"></pre>
+            <button class="copy-btn" onclick="copyPayload()">Copy Payload</button>
+        </div>
+
+        <div id="logContainer" class="log-container hidden">
+            <h3>Payment Log</h3>
+            <div id="logOutput" class="log-output"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = null;
+        let storeId = null;
+
+        function showMessage(message, type = 'error') {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function parseAndShowDetails() {
+            const jsonInput = document.getElementById('jsonInput').value.trim();
+
+            if (!jsonInput) {
+                showMessage('Please paste your JSON data first.');
+                return;
+            }
+
+            try {
+                const response = JSON.parse(jsonInput);
+
+                if (!response.success || !response.data) {
+                    showMessage('API response indicates failure: ' + (response.message || 'Unknown error'));
+                    return;
+                }
+
+                currentData = response.data;
+                storeId = currentData.store ? currentData.store.id : null;
+                displayOrderDetails(currentData);
+                showMessage('JSON parsed successfully!', 'success');
+
+            } catch (error) {
+                showMessage(`Invalid JSON format: ${error.message}`);
+            }
+        }
+
+        function displayOrderDetails(data) {
+            const detailsContent = document.getElementById('detailsContent');
+            const store = data.store;
+            const summary = data.summary;
+            const items = data.items;
+            const coupon = data.coupon;
+
+            let itemsHtml = '';
+            if (items && items.length > 0) {
+                itemsHtml = '<div class="items-section"><strong>Items:</strong>';
+                items.forEach(item => {
+                    itemsHtml += `
+                        <div class="item-row">
+                            <span class="item-name">${item.product_name} <span class="item-qty">x${item.quantity}</span></span>
+                            <span>₹${item.total.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+                itemsHtml += '</div>';
+            }
+
+            detailsContent.innerHTML = `
+                <div class="detail-item">
+                    <span class="detail-label">Store:</span>
+                    <span class="detail-value">${store.name} (${store.short_name || 'N/A'})</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Store ID:</span>
+                    <span class="detail-value">${store.id}</span>
+                </div>
+
+                ${itemsHtml}
+
+                <div class="summary-section">
+                    <div class="detail-item">
+                        <span class="detail-label">Total Items:</span>
+                        <span class="detail-value">${summary.total_items}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Subtotal (Base):</span>
+                        <span class="detail-value">₹${summary.subtotal.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Tax:</span>
+                        <span class="detail-value">₹${summary.total_tax.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Amount Before Discount:</span>
+                        <span class="detail-value">₹${summary.amount_before_discount.toFixed(2)}</span>
+                    </div>
+                    ${summary.discount_amount > 0 ? `
+                    <div class="detail-item">
+                        <span class="detail-label">Discount ${coupon ? '(' + coupon.code + ')' : ''}:</span>
+                        <span class="detail-value" style="color: green;">-₹${summary.discount_amount.toFixed(2)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="detail-item">
+                        <span class="detail-label">Total After Discount:</span>
+                        <span class="detail-value">₹${summary.total_after_discount.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Wallet Balance:</span>
+                        <span class="detail-value">₹${summary.wallet_balance.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Wallet to Use:</span>
+                        <span class="detail-value" style="color: blue;">₹${summary.wallet_to_use.toFixed(2)}</span>
+                    </div>
+                    <div class="detail-item total-amount">
+                        <span class="detail-label">Online Payment:</span>
+                        <span class="detail-value">₹${summary.online_payment_amount.toFixed(2)}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('orderDetails').classList.remove('hidden');
+
+            // Show appropriate payment button
+            if (data.payment_required && data.razorpay) {
+                document.getElementById('razorpayInfo').style.display = 'block';
+                document.getElementById('walletOnlyInfo').style.display = 'none';
+            } else {
+                document.getElementById('razorpayInfo').style.display = 'none';
+                document.getElementById('walletOnlyInfo').style.display = 'block';
+            }
+        }
+
+        function processPayment() {
+            if (!currentData || !currentData.razorpay) {
+                showMessage('No Razorpay payment data available.');
+                return;
+            }
+
+            const razorpayData = currentData.razorpay;
+
+            const options = {
+                key: razorpayData.key,
+                amount: razorpayData.amount,
+                currency: razorpayData.currency || 'INR',
+                name: razorpayData.name,
+                description: razorpayData.description,
+                image: razorpayData.image,
+                order_id: razorpayData.order_id,
+                prefill: razorpayData.prefill,
+                notes: razorpayData.notes,
+                theme: razorpayData.theme,
+                handler: function (response) {
+                    handlePaymentSuccess(response);
+                },
+                modal: {
+                    ondismiss: function() {
+                        logMessage('Payment cancelled by user', 'WARNING');
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+
+            rzp.on('payment.failed', function (response) {
+                handlePaymentFailure(response.error);
+            });
+
+            rzp.open();
+        }
+
+        function handlePaymentSuccess(response) {
+            const payload = {
+                store_id: storeId,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+            };
+
+            showCompletePayload(payload);
+
+            logMessage(`
+=== PAYMENT SUCCESS ===
+Timestamp: ${new Date().toISOString()}
+Payment ID: ${response.razorpay_payment_id}
+Order ID: ${response.razorpay_order_id}
+Signature: ${response.razorpay_signature}
+
+Use the payload above to call qsr_complete API
+===========================
+            `, 'SUCCESS');
+
+            showMessage('Payment successful! Copy the payload below for qsr_complete API.', 'success');
+        }
+
+        function handlePaymentFailure(error) {
+            logMessage(`
+=== PAYMENT FAILED ===
+Timestamp: ${new Date().toISOString()}
+Error Code: ${error.code}
+Description: ${error.description}
+Source: ${error.source}
+Step: ${error.step}
+Reason: ${error.reason}
+===========================
+            `, 'FAILED');
+
+            showMessage('Payment failed: ' + error.description);
+        }
+
+        function simulateWalletPayment() {
+            if (!currentData || !currentData.pending_order_id) {
+                showMessage('No pending order ID found for wallet payment.');
+                return;
+            }
+
+            const payload = {
+                store_id: storeId,
+                pending_order_id: currentData.pending_order_id
+            };
+
+            showCompletePayload(payload);
+
+            logMessage(`
+=== WALLET PAYMENT ===
+Timestamp: ${new Date().toISOString()}
+Pending Order ID: ${currentData.pending_order_id}
+Store ID: ${storeId}
+
+Use the payload above to call qsr_complete API
+===========================
+            `, 'SUCCESS');
+
+            showMessage('Wallet payment ready! Copy the payload below for qsr_complete API.', 'success');
+        }
+
+        function showCompletePayload(payload) {
+            document.getElementById('completePayload').textContent = JSON.stringify(payload, null, 2);
+            document.getElementById('paymentResponse').classList.remove('hidden');
+        }
+
+        function copyPayload() {
+            const payload = document.getElementById('completePayload').textContent;
+            navigator.clipboard.writeText(payload).then(() => {
+                showMessage('Payload copied to clipboard!', 'success');
+            }).catch(err => {
+                showMessage('Failed to copy: ' + err);
+            });
+        }
+
+        function logMessage(message, status = 'INFO') {
+            const logOutput = document.getElementById('logOutput');
+            const logContainer = document.getElementById('logContainer');
+
+            logOutput.textContent = message + '\n' + logOutput.textContent;
+            logContainer.classList.remove('hidden');
+            logContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearAll() {
+            document.getElementById('jsonInput').value = '';
+            document.getElementById('messageContainer').innerHTML = '';
+            document.getElementById('orderDetails').classList.add('hidden');
+            document.getElementById('paymentResponse').classList.add('hidden');
+            document.getElementById('logContainer').classList.add('hidden');
+            document.getElementById('logOutput').textContent = '';
+            document.getElementById('completePayload').textContent = '';
+            currentData = null;
+            storeId = null;
+        }
+
+        // Sample data for reference
+        window.onload = function() {
+            const sampleData = `{
+    "status": 200,
+    "success": true,
+    "message": "Order initiated successfully",
+    "data": {
+        "store": {
+            "id": 1,
+            "name": "Joy Foods Main Kitchen",
+            "short_name": "Main"
+        },
+        "items": [
+            {
+                "cart_id": 1,
+                "product_id": 5,
+                "product_name": "Chicken Biryani",
+                "quantity": 2,
+                "unit_price": 250.00,
+                "tax_percentage": 5.00,
+                "base_price": 238.10,
+                "tax_amount": 11.90,
+                "subtotal": 476.19,
+                "total": 500.00,
+                "note": null,
+                "is_in_stock": true
+            },
+            {
+                "cart_id": 2,
+                "product_id": 8,
+                "product_name": "Butter Naan",
+                "quantity": 4,
+                "unit_price": 40.00,
+                "tax_percentage": 5.00,
+                "base_price": 38.10,
+                "tax_amount": 1.90,
+                "subtotal": 152.38,
+                "total": 160.00,
+                "note": "Extra butter",
+                "is_in_stock": true
+            }
+        ],
+        "summary": {
+            "total_items": 6,
+            "subtotal": 628.57,
+            "total_tax": 31.43,
+            "amount_before_discount": 660.00,
+            "discount_amount": 60.00,
+            "total_after_discount": 600.00,
+            "wallet_balance": 500.00,
+            "wallet_to_use": 200.00,
+            "online_payment_amount": 400.00
+        },
+        "coupon": {
+            "id": 1,
+            "code": "WELCOME10",
+            "discount_type": "PERCENTAGE",
+            "discount_value": 10
+        },
+        "razorpay": {
+            "key": "rzp_test_xxxxx",
+            "amount": 40000,
+            "currency": "INR",
+            "name": "Joy Foods",
+            "description": "Pay with Card / Net Banking / Wallets / UPI",
+            "image": "http://localhost/joy_foods_backend/assets/images/logo.png",
+            "order_id": "order_ABC123XYZ",
+            "prefill": {
+                "name": "John Doe",
+                "email": "john@example.com",
+                "contact": "9876543210"
+            },
+            "notes": {
+                "employee_id": "123",
+                "store_id": "1",
+                "module": "QSR"
+            },
+            "theme": {
+                "color": "#BD3839"
+            }
+        },
+        "payment_required": true
+    }
+}`;
+            document.getElementById('jsonInput').placeholder = 'Paste your qsr_initiate API response here...\n\nSample format:\n' + sampleData.substring(0, 500) + '...';
+        };
+    </script>
+</body>
+</html>
